@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monty Hall Problem Explained — Interactive Card Simulation | Why You Should Always Switch</title>
+<meta name="description" content="Finally understand the Monty Hall problem with an interactive 52-card simulation. See why switching wins 98% of the time and build real intuition for the probability — not just memorize the answer.">
+<meta name="keywords" content="monty hall problem, monty hall explained, monty hall problem explained, why switch monty hall, monty hall simulation, monty hall interactive, probability puzzle, conditional probability, monty hall intuition">
+<link rel="canonical" href="https://montyhallexplained.cc/">
+<meta property="og:title" content="Monty Hall Problem Explained — Interactive Card Simulation">
+<meta property="og:description" content="The Monty Hall problem reframed with 52 cards instead of 3 doors. Watch the dealer flip 50 cards, then decide: keep or switch? Build real intuition for why switching always wins.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://montyhallexplained.cc/">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Monty Hall Explained">
+<meta property="og:image" content="https://montyhallexplained.cc/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Monty Hall Problem Explained — Interactive Card Simulation">
+<meta name="twitter:description" content="52 cards face-down. You pick one. The dealer flips 50. Why should you switch? An interactive proof.">
+<meta name="robots" content="index, follow">
+<meta name="author" content="montyhallexplained.cc">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Monty Hall Problem Explained — Interactive Card Simulation",
+  "description": "An interactive visualization that reframes the Monty Hall problem using 52 playing cards to build genuine intuition for why switching is always the correct strategy.",
+  "url": "https://montyhallexplained.cc/",
+  "mainEntity": {
+    "@type": "Article",
+    "headline": "The Monty Hall Problem Explained With Cards",
+    "description": "Why switching wins: an interactive 52-card simulation of the Monty Hall problem that makes the probability intuitive instead of just memorizable.",
+    "author": { "@type": "Person", "name": "montyhallexplained.cc" },
+    "keywords": "monty hall problem, probability, conditional probability, switching strategy, interactive simulation"
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;0,800;1,300;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f4;
+    --surface: #ffffff;
+    --surface2: #f3f0e9;
+    --border: #e0dbd2;
+    --text: #1a1714;
+    --text-mid: #3a352e;
+    --text-dim: #635d54;
+    --gold: #b8860b;
+    --gold-soft: rgba(184,134,11,0.08);
+    --gold-border: rgba(184,134,11,0.3);
+    --green: #27864a;
+    --green-soft: rgba(39,134,74,0.07);
+    --green-border: rgba(39,134,74,0.2);
+    --red: #c0392b;
+    --red-soft: rgba(192,57,43,0.07);
+    --red-border: rgba(192,57,43,0.2);
+    --spade: #1a1714;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'Source Sans 3',sans-serif; min-height:100vh; -webkit-font-smoothing:antialiased; }
+  .container { max-width:780px; margin:0 auto; padding:48px 24px 80px; }
+
+  /* ── Header ── */
+  header { text-align:center; margin-bottom:40px; }
+  header .mono { font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--text-dim); margin-bottom:12px; }
+  header h1 { font-family:'Crimson Pro',serif; font-weight:800; font-size:clamp(28px,5vw,42px); line-height:1.15; margin-bottom:12px; }
+
+  .play-btn {
+    display:inline-block; margin-bottom:20px;
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+    padding:10px 28px; border:1.5px solid var(--spade);
+    background:var(--spade); color:var(--bg); border-radius:6px;
+    cursor:pointer; transition:all 0.2s; font-weight:500;
+    letter-spacing:0.5px;
+  }
+  .play-btn:hover { opacity:0.85; }
+
+  @media (max-width:768px) {
+    .felt { padding:14px 10px 18px; }
+    .card-grid {
+      display:grid !important;
+      grid-template-columns:repeat(8, 1fr) !important;
+      gap:4px !important;
+      flex-wrap:nowrap;
+    }
+    .c {
+      width:auto !important;
+      height:auto !important;
+      aspect-ratio:5/7;
+      min-width:0 !important;
+      border-radius:3px;
+    }
+    .c.down::after { inset:2px; }
+    .c .tag { font-size:6px; top:-11px; }
+  }
+  header p { font-size:15px; color:var(--text-mid); max-width:540px; margin:0 auto; line-height:1.7; font-weight:300; }
+  header p strong { color:var(--text); font-weight:500; }
+
+  .intro-steps {
+    max-width:540px;
+    margin:0 auto;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    text-align:center;
+  }
+  .intro-steps .step {
+    font-size:15px;
+    color:var(--text-mid);
+    line-height:1.6;
+    font-weight:300;
+  }
+  .intro-steps .step strong { color:var(--text); font-weight:500; }
+  .intro-steps .step.emphasis {
+    font-family:'Crimson Pro',serif;
+    font-size:17px;
+    font-weight:600;
+    font-style:italic;
+    color:var(--text);
+    margin-top:4px;
+    margin-bottom:4px;
+  }
+
+  /* ── Score strip ── */
+  .score-strip {
+    margin-bottom:28px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+  }
+  .score-header {
+    font-family:'Crimson Pro',serif;
+    font-size:17px;
+    font-weight:600;
+    color:var(--text);
+    padding:14px 20px 0;
+    text-align:center;
+  }
+  .score-row {
+    display:flex;
+    justify-content:center;
+    gap:24px;
+    padding:8px 20px 12px;
+    flex-wrap:wrap;
+  }
+  .score-item {
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--text-mid);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .score-item .sv { font-size:17px; font-weight:600; }
+  .score-item .sv.green { color:var(--green); }
+  .score-item .sv.red { color:var(--red); }
+  .score-item .sv.dim { color:var(--text); }
+
+  /* ── Further reading ── */
+  .further-reading {
+    margin-top:48px; padding-top:32px;
+    border-top:1px solid var(--border);
+  }
+  .fr-heading {
+    font-family:'Crimson Pro',serif; font-size:18px;
+    font-weight:600; color:var(--text); margin-bottom:16px;
+  }
+  .fr-list {
+    list-style:none; padding:0;
+    display:flex; flex-direction:column; gap:10px;
+  }
+  .fr-list li {
+    font-size:14px; line-height:1.5;
+  }
+  .fr-list a {
+    color:var(--text); text-decoration:underline;
+    text-decoration-color:var(--border); text-underline-offset:2px;
+    transition:text-decoration-color 0.2s;
+  }
+  .fr-list a:hover { text-decoration-color:var(--text); }
+  .fr-source { color:var(--text-dim); font-size:13px; }
+
+  .site-footer {
+    margin-top:40px; padding-top:20px;
+    border-top:1px solid var(--border);
+    text-align:center;
+  }
+  .site-footer p {
+    font-size:13px; color:var(--text-dim);
+  }
+  .site-footer a {
+    color:var(--text-mid); text-decoration:underline;
+    text-decoration-color:var(--border); text-underline-offset:2px;
+  }
+  .site-footer a:hover { text-decoration-color:var(--text-mid); }
+
+  /* ── Explain ── */
+  .explain-wrap { margin-bottom:28px; margin-top:40px; }
+  .explain-toggle {
+    display:block; margin:0 auto;
+    font-family:'IBM Plex Mono',monospace; font-size:14px;
+    letter-spacing:0.5px; padding:12px 28px;
+    background:transparent; border:1.5px solid var(--border);
+    color:var(--text-mid); border-radius:6px;
+    cursor:pointer; transition:all 0.2s;
+  }
+  .explain-toggle:hover { border-color:var(--text-dim); color:var(--text); }
+  .explain-toggle.open { border-color:var(--text-dim); color:var(--text); }
+  .explain-body {
+    max-height:0; overflow:hidden; opacity:0;
+    transition:max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
+    margin-top:0;
+  }
+  .explain-body.open {
+    max-height:600px; opacity:1; margin-top:16px;
+  }
+  .explain-body p {
+    font-family:'Crimson Pro',serif; font-size:16px;
+    line-height:1.7; color:var(--text-mid); margin-bottom:12px;
+  }
+  .explain-body p:last-child { margin-bottom:0; }
+  .explain-body p strong { color:var(--text); font-weight:600; }
+  .explain-body p em { font-style:italic; }
+
+  /* ── Felt ── */
+  .felt {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:24px 24px 28px;
+    margin-bottom:20px;
+    min-height:200px;
+    position:relative;
+  }
+
+  .felt-heading {
+    font-family:'Crimson Pro',serif;
+    font-size:22px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:18px;
+    color:var(--text);
+    transition: opacity 0.3s;
+  }
+
+  .felt-heading.dim {
+    font-size:14px;
+    font-weight:400;
+    color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace;
+    letter-spacing:0.5px;
+  }
+
+  .card-grid {
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    justify-content:center;
+  }
+
+  /* ── Cards ── */
+  .c {
+    width:36px; height:50px; border-radius:4px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:12px; flex-shrink:0; position:relative;
+    transition:all 0.35s cubic-bezier(0.4,0,0.2,1);
+    transform-origin:center;
+  }
+
+  .c.down {
+    background:linear-gradient(145deg,#3d5a80,#2c4a6e);
+    border:1.5px solid #25405c;
+    box-shadow:0 1px 4px rgba(0,0,0,0.08);
+  }
+  .c.down::after {
+    content:''; position:absolute; inset:3px;
+    border:1px solid rgba(255,255,255,0.12); border-radius:2px;
+  }
+
+  .c.selectable { cursor:pointer; }
+  .c.selectable:hover {
+    transform:translateY(-3px);
+    box-shadow:0 0 0 2px var(--gold),0 3px 10px rgba(184,134,11,0.2);
+  }
+
+  .c.picked {
+    box-shadow:0 0 0 2.5px var(--gold),0 2px 10px rgba(184,134,11,0.25)!important;
+    z-index:2; transform:translateY(-4px); cursor:default;
+  }
+
+  .c.flipped {
+    background:var(--surface2); border:1px dashed var(--border);
+    opacity:0.18; transform:scale(0.85);
+    font-family:'IBM Plex Mono',monospace; font-size:9px; color:var(--text-dim);
+    cursor:default;
+  }
+
+  .c.survivor {
+    box-shadow:0 0 0 2.5px var(--spade),0 3px 14px rgba(0,0,0,0.15);
+    z-index:2; transform:translateY(-4px);
+    animation:pulse 2s ease-in-out infinite;
+    cursor:default;
+  }
+
+  .c.revealed-ace {
+    background:#fff; border:2px solid var(--spade);
+    font-family:'Crimson Pro',serif; font-size:15px; font-weight:700; color:var(--spade);
+    box-shadow:0 2px 12px rgba(0,0,0,0.1); z-index:3;
+    transform:translateY(-6px) scale(1.05); cursor:default;
+  }
+
+  .c.revealed-junk {
+    background:#fff; border:1.5px solid var(--red);
+    font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:500;
+    color:var(--red); opacity:0.7; cursor:default;
+  }
+
+  @keyframes pulse {
+    0%,100%{box-shadow:0 0 0 2.5px var(--spade),0 3px 14px rgba(0,0,0,0.15);}
+    50%{box-shadow:0 0 0 2.5px var(--spade),0 3px 20px rgba(0,0,0,0.25);}
+  }
+
+  .c .tag {
+    position:absolute; top:-14px;
+    font-family:'IBM Plex Mono',monospace; font-size:7px;
+    letter-spacing:1px; text-transform:uppercase;
+    white-space:nowrap; font-weight:600;
+  }
+  .c .tag.yours { color:var(--gold); }
+  .c .tag.dealer { color:var(--spade); }
+
+  /* ── Choice buttons ── */
+  .choice-row {
+    display:none;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:24px;
+  }
+  .choice-row.visible { display:flex; }
+
+  .choice-btn {
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px; padding:12px 28px;
+    border-radius:6px; cursor:pointer;
+    transition:all 0.2s; font-weight:500;
+    letter-spacing:0.5px; display:flex;
+    flex-direction:column; align-items:center; gap:2px;
+  }
+  .choice-btn .cb-sub {
+    font-size:9px; letter-spacing:1px;
+    text-transform:uppercase; opacity:0.7;
+  }
+  .choice-btn.keep-btn {
+    background:var(--surface); border:1.5px solid var(--gold-border); color:var(--gold);
+  }
+  .choice-btn.switch-btn {
+    background:var(--spade); border:1.5px solid var(--spade); color:var(--bg);
+  }
+  .choice-btn:hover { opacity:0.85; }
+
+  /* ── Narration ── */
+  .narration {
+    background:var(--surface); border:1px solid var(--border);
+    border-left:3px solid var(--spade); border-radius:0 10px 10px 0;
+    padding:20px 22px; margin-bottom:22px; min-height:56px;
+  }
+  .narration p {
+    font-family:'Crimson Pro',serif; font-size:17px;
+    line-height:1.65; color:var(--text); font-weight:400;
+  }
+  .narration p strong { font-weight:700; }
+  .narration p em { font-style:italic; color:var(--text-mid); }
+
+  /* ── Reveal area ── */
+  .reveal-area { display:none; margin-top:0; }
+  .reveal-area.visible { display:block; }
+
+  .end-columns { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px; }
+  @media(max-width:500px){.end-columns{grid-template-columns:1fr;}}
+
+  .end-col {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:10px; padding:22px; text-align:center;
+    transition: border-color 0.4s;
+  }
+  .end-col.winner { border-color:var(--green); background:var(--green-soft); }
+  .end-col.loser { border-color:var(--red); background:var(--red-soft); }
+
+  .end-col .end-label {
+    font-family:'IBM Plex Mono',monospace; font-size:9px;
+    letter-spacing:2px; text-transform:uppercase; color:var(--text-dim); margin-bottom:10px;
+  }
+  .end-col .end-card-visual { display:flex; justify-content:center; margin-bottom:12px; }
+  .end-col .end-card {
+    width:52px; height:72px; border-radius:5px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Crimson Pro',serif; font-size:18px; font-weight:700;
+  }
+  .end-col .end-card.ace-card {
+    background:#fff; border:2px solid var(--spade); color:var(--spade);
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+  }
+  .end-col .end-card.junk-card {
+    background:var(--surface2); border:2px solid var(--border); color:var(--text-dim);
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+  }
+  .end-col .origin {
+    font-family:'Crimson Pro',serif; font-size:14px;
+    line-height:1.5; color:var(--text-mid); margin-top:8px;
+  }
+  .end-col .origin strong { color:var(--text); font-weight:600; }
+
+  /* ── Result ── */
+  .result-banner {
+    display:none; text-align:center; padding:18px;
+    border-radius:10px; margin-bottom:16px;
+  }
+  .result-banner.visible { display:block; }
+  .result-banner.won { background:var(--green-soft); border:1px solid var(--green-border); }
+  .result-banner.lost { background:var(--red-soft); border:1px solid var(--red-border); }
+  .result-banner .rb-text { font-family:'Crimson Pro',serif; font-size:18px; font-weight:600; }
+  .result-banner.won .rb-text { color:var(--green); }
+  .result-banner.lost .rb-text { color:var(--red); }
+  .result-banner .rb-sub { font-size:13px; color:var(--text-mid); margin-top:4px; font-weight:300; }
+
+  /* ── Redeal ── */
+  .redeal-row { display:none; text-align:center; margin-top:8px; }
+  .redeal-row.visible { display:block; }
+  .redeal-btn {
+    font-family:'IBM Plex Mono',monospace; font-size:13px;
+    padding:10px 32px; border:1.5px solid var(--spade);
+    background:var(--spade); color:var(--bg); border-radius:6px;
+    cursor:pointer; transition:all 0.2s; font-weight:500; letter-spacing:0.5px;
+  }
+  .redeal-btn:hover { opacity:0.85; }
+</style>
+</head>
+<body>
+<div class="container" id="top">
+
+  <header>
+    <div class="mono">The Monty Hall Problem</div>
+    <h1>Find the Ace ♠</h1>
+    <button class="play-btn" onclick="document.getElementById('felt').scrollIntoView({behavior:'smooth'})">Play the game ↓</button>
+    <div class="intro-steps">
+      <div class="step">There's a famous probability puzzle where you pick one of three doors, the host opens a losing door, and asks if you want to switch.</div>
+      <div class="step">Your intuition says it's 50/50 — so why would switching matter?</div>
+      <div class="step emphasis">But it's not 50/50, and that's genuinely hard to understand.</div>
+      <div class="step">3 doors is a small number, so this version uses a <strong>full deck of 52 cards.</strong></div>
+      <div class="step">Same logic, bigger deck — and it might finally make the answer click.</div>
+    </div>
+  </header>
+
+  <div class="score-strip" id="scoreStrip">
+    <div class="score-header">Tracking your results</div>
+    <div class="score-row">
+      <div class="score-item">Rounds played <span class="sv dim" id="sPlayed">0</span></div>
+      <div class="score-item">Switched &amp; won <span class="sv green" id="sSwitchW">0</span></div>
+      <div class="score-item">Kept &amp; won <span class="sv green" id="sKeepW">0</span></div>
+      <div class="score-item">Wrong <span class="sv red" id="sWrong">0</span></div>
+    </div>
+  </div>
+
+  <div class="felt" id="felt">
+    <div class="felt-heading" id="feltHead">Choose a card</div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+
+  <div class="choice-row" id="choiceRow">
+    <button class="choice-btn keep-btn" onclick="choose('keep')">
+      Keep
+      <span class="cb-sub">your card</span>
+    </button>
+    <button class="choice-btn switch-btn" onclick="choose('switch')">
+      Switch
+      <span class="cb-sub">protected card</span>
+    </button>
+  </div>
+
+  <div class="narration" id="narration">
+    <p id="narratText"><em>Pick any card from the deck above.</em></p>
+  </div>
+
+  <div class="reveal-area" id="revealArea">
+    <div class="result-banner" id="resultBanner">
+      <div class="rb-text" id="rbText"></div>
+      <div class="rb-sub" id="rbSub"></div>
+    </div>
+
+    <div class="end-columns" id="endCols">
+      <div class="end-col" id="endYours">
+        <div class="end-label">Your card</div>
+        <div class="end-card-visual"><div class="end-card" id="ecYours"></div></div>
+        <div class="origin" id="origYours"></div>
+      </div>
+      <div class="end-col" id="endDealer">
+        <div class="end-label">Dealer's protected card</div>
+        <div class="end-card-visual"><div class="end-card" id="ecDealer"></div></div>
+        <div class="origin" id="origDealer"></div>
+      </div>
+    </div>
+
+    <div class="redeal-row" id="redealRow">
+      <button class="redeal-btn" onclick="redeal()">Deal Again</button>
+    </div>
+  </div>
+
+  <div class="explain-wrap">
+    <button class="explain-toggle" id="explainBtn" onclick="toggleExplain()">Explain the math ▼</button>
+    <div class="explain-body" id="explainBody">
+      <p>When the cards are dealt, the Ace is placed randomly under one of 52 cards. You point to one. Your odds of having picked the Ace: <strong>1 in 52.</strong> That means there's a <strong>51 in 52</strong> chance it's somewhere in the other 51 cards.</p>
+      <p>Now the dealer — who knows where the Ace is — flips over 50 of those 51 cards, and he's <strong>forbidden from flipping the Ace.</strong> This is the key: he can't act randomly. If the Ace is among those 51 cards (which it is 51 out of 52 times), he <em>must</em> leave it face-down. He has no choice. His knowledge forces his hand.</p>
+      <p>So ask yourself: <strong>why did that last card survive?</strong></p>
+      <p>Your card survived because you froze it — a blind guess, protected by the rules of the game, not by any information. The other card survived because the dealer <em>was forced to protect it</em> while eliminating everything else. One card was preserved by ignorance. The other was preserved by knowledge.</p>
+      <p>They look the same — two face-down cards — but they have completely different origins. That's why they have completely different odds. You're not choosing between two equal unknowns. You're choosing between <strong>the output of a blind guess</strong> and <strong>the output of an informed elimination process.</strong></p>
+      <p>With 3 cards (the classic Monty Hall problem), this same logic applies — switching wins 2 out of 3 times. But 33% vs 67% is close enough to 50/50 that your brain rebels. With 52 cards, the asymmetry is so extreme that nobody would hesitate. The math is identical. Only the feeling changes.</p>
+      <h3 style="font-family:'Crimson Pro',serif;font-size:16px;font-weight:600;color:var(--text);margin-top:16px;margin-bottom:8px;">The general formula</h3>
+      <p>For any number of cards <em>n</em>: keeping your card wins 1/<em>n</em> of the time. Switching wins (<em>n</em>−1)/<em>n</em> of the time. With 3 cards, that's 33% vs 67%. With 52 cards, it's 1.9% vs 98.1%. The classic Monty Hall problem with 3 doors is just this game with <em>n</em> = 3.</p>
+    </div>
+  </div>
+
+  <section class="further-reading" aria-label="Further reading">
+    <h2 class="fr-heading">Further reading</h2>
+    <ul class="fr-list">
+      <li><a href="https://betterexplained.com/articles/understanding-the-monty-hall-problem/" target="_blank" rel="noopener">Understanding the Monty Hall Problem</a> <span class="fr-source">— Better Explained</span></li>
+      <li><a href="https://en.wikipedia.org/wiki/Monty_Hall_problem" target="_blank" rel="noopener">Monty Hall problem</a> <span class="fr-source">— Wikipedia</span></li>
+      <li><a href="https://www.wiris.com/en/blog/monty-hall-problem-explained/" target="_blank" rel="noopener">Monty Hall Problem Explained</a> <span class="fr-source">— Wiris</span></li>
+      <li><a href="https://matheducators.stackexchange.com/questions/2679/how-to-explain-monty-hall-problem-when-they-just-dont-get-it" target="_blank" rel="noopener">How to explain the Monty Hall problem when they just don't get it</a> <span class="fr-source">— Math Educators Stack Exchange</span></li>
+      <li><a href="https://reddit.com/r/askmath/comments/14suc7s/can_someone_explain_to_me_the_monty_hall_problem/" target="_blank" rel="noopener">Can someone explain the Monty Hall problem?</a> <span class="fr-source">— r/askmath</span></li>
+    </ul>
+  </section>
+
+  <footer class="site-footer">
+    <p>A free, open-source pedagogical tool. <a href="https://github.com/mehughes124/montyhallexplained" target="_blank" rel="noopener">View source on GitHub.</a></p>
+  </footer>
+
+</div>
+
+<script>
+const N = 52;
+const FLIP_MS = 21; // ~15% slower than 18
+let aceI, pickI, survI, phase = 'pick'; // pick | removing | decide | done
+let stats = { played:0, switchW:0, keepW:0, wrong:0 };
+
+// ── Init: spread cards ──
+function initDeck() {
+  phase = 'pick';
+  aceI = Math.floor(Math.random() * N);
+  pickI = -1; survI = -1;
+
+  const h = document.getElementById('feltHead');
+  h.textContent = 'Choose a card';
+  h.classList.remove('dim');
+
+  document.getElementById('choiceRow').classList.remove('visible');
+  document.getElementById('revealArea').classList.remove('visible');
+  document.getElementById('resultBanner').classList.remove('visible','won','lost');
+  document.getElementById('redealRow').classList.remove('visible');
+  document.getElementById('endYours').classList.remove('winner','loser');
+  document.getElementById('endDealer').classList.remove('winner','loser');
+
+  const g = document.getElementById('cardGrid');
+  g.innerHTML = '';
+
+  for (let i = 0; i < N; i++) {
+    const c = document.createElement('div');
+    c.className = 'c down selectable';
+    c.id = 'c' + i;
+    c.style.opacity = '0';
+    c.style.transform = 'scale(0.8)';
+    c.addEventListener('click', () => pickCard(i));
+    g.appendChild(c);
+  }
+
+  document.getElementById('narratText').innerHTML = '<em>Pick any card from the deck above.</em>';
+
+  let d = 0;
+  for (let i = 0; i < N; i++) {
+    setTimeout(() => {
+      const e = document.getElementById('c' + i);
+      if (e) { e.style.opacity = '1'; e.style.transform = 'scale(1)'; }
+    }, d);
+    d += 8;
+  }
+}
+
+// ── Pick ──
+function pickCard(idx) {
+  if (phase !== 'pick') return;
+  phase = 'removing';
+  pickI = idx;
+
+  // Determine survivor
+  if (aceI === pickI) {
+    do { survI = Math.floor(Math.random() * N); } while (survI === pickI);
+  } else {
+    survI = aceI;
+  }
+
+  // Remove selectable from all
+  document.querySelectorAll('.c').forEach(c => c.classList.remove('selectable'));
+
+  // Mark picked
+  const pc = document.getElementById('c' + pickI);
+  pc.classList.add('picked');
+  const tag = document.createElement('span');
+  tag.className = 'tag yours'; tag.textContent = 'yours';
+  pc.appendChild(tag);
+
+  // Update heading
+  const h = document.getElementById('feltHead');
+  h.textContent = 'Now 50 incorrect cards are being removed';
+  h.classList.add('dim');
+
+  say('You picked a card. The dealer — who knows where the Ace is — now flips every card he can. <strong>He can never flip the Ace.</strong>');
+
+  setTimeout(flipSequence, 500);
+}
+
+// ── Flip ──
+function flipSequence() {
+  const f = [];
+  for (let i = 0; i < N; i++) { if (i !== pickI && i !== survI) f.push(i); }
+  // Shuffle
+  for (let i = f.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [f[i], f[j]] = [f[j], f[i]];
+  }
+
+  let count = 0;
+  function nx() {
+    if (count >= f.length) { setTimeout(showChoice, 350); return; }
+    const e = document.getElementById('c' + f[count]);
+    e.classList.remove('down');
+    e.classList.add('flipped');
+    e.textContent = '×';
+    e.style.pointerEvents = 'none';
+    count++;
+    setTimeout(nx, FLIP_MS);
+  }
+  nx();
+}
+
+// ── Show choice ──
+function showChoice() {
+  phase = 'decide';
+
+  const sc = document.getElementById('c' + survI);
+  sc.classList.add('survivor');
+  const tag = document.createElement('span');
+  tag.className = 'tag dealer'; tag.textContent = 'protected';
+  sc.appendChild(tag);
+
+  const h = document.getElementById('feltHead');
+  h.textContent = 'Two cards remain';
+  h.classList.remove('dim');
+  h.style.fontSize = '18px';
+
+  say('Your card survived because <strong>you froze it</strong> with a blind guess. The other survived because the dealer <strong>was forced to protect it</strong>. Keep yours, or switch?');
+
+  document.getElementById('choiceRow').classList.add('visible');
+}
+
+// ── Choose ──
+function choose(ch) {
+  if (phase !== 'decide') return;
+  phase = 'done';
+
+  document.getElementById('choiceRow').classList.remove('visible');
+
+  // Reveal cards on the grid
+  const pc = document.getElementById('c' + pickI);
+  const sc = document.getElementById('c' + survI);
+
+  pc.classList.remove('down','picked'); pc.innerHTML = '';
+  if (aceI === pickI) { pc.className = 'c revealed-ace'; pc.textContent = 'A♠'; }
+  else { pc.className = 'c revealed-junk'; pc.textContent = '—'; }
+
+  sc.classList.remove('down','survivor'); sc.innerHTML = '';
+  if (aceI === survI) { sc.className = 'c revealed-ace'; sc.textContent = 'A♠'; }
+  else { sc.className = 'c revealed-junk'; sc.textContent = '—'; }
+
+  // Result
+  const won = (ch === 'switch' && aceI === survI) || (ch === 'keep' && aceI === pickI);
+  stats.played++;
+  if (won && ch === 'switch') stats.switchW++;
+  else if (won && ch === 'keep') stats.keepW++;
+  else stats.wrong++;
+
+  updateScores();
+
+  // Reveal area
+  const ra = document.getElementById('revealArea');
+  ra.classList.add('visible');
+
+  // Result banner
+  const b = document.getElementById('resultBanner');
+  b.classList.add('visible', won ? 'won' : 'lost');
+  const rt = document.getElementById('rbText'), rs = document.getElementById('rbSub');
+
+  if (won && ch === 'switch') {
+    rt.textContent = 'You switched and found the Ace.';
+    rs.textContent = "The dealer's knowledge led you to it — as it will 51 out of 52 times.";
+  } else if (won && ch === 'keep') {
+    rt.textContent = 'You kept your card and found the Ace.';
+    rs.textContent = "A 1-in-52 blind guess, and you nailed it. Don't expect that to happen often.";
+  } else if (!won && ch === 'switch') {
+    rt.textContent = 'You switched, but your original card had the Ace.';
+    rs.textContent = "The rare 1-in-52 case. Bad luck — switching is still the right call.";
+  } else {
+    rt.textContent = 'You kept your card. The Ace was the one the dealer protected.';
+    rs.textContent = "It was right there — the card he couldn't flip. 51 out of 52 times, that's where it is.";
+  }
+
+  // End columns
+  const eY = document.getElementById('endYours');
+  const eD = document.getElementById('endDealer');
+  const ecY = document.getElementById('ecYours');
+  const ecD = document.getElementById('ecDealer');
+  const oY = document.getElementById('origYours');
+  const oD = document.getElementById('origDealer');
+
+  eY.classList.remove('winner','loser');
+  eD.classList.remove('winner','loser');
+
+  if (aceI === pickI) {
+    ecY.className = 'end-card ace-card'; ecY.textContent = 'A♠';
+    ecD.className = 'end-card junk-card'; ecD.textContent = '—';
+    oY.innerHTML = 'Your blind guess <strong>was right</strong>. That\'s a 1 in 52 shot.';
+    oD.innerHTML = 'The dealer protected a random junk card — he had no choice since <strong>you had the Ace</strong>.';
+    if (ch === 'keep') { eY.classList.add('winner'); eD.classList.add('loser'); }
+    else { eY.classList.add('loser'); eD.classList.add('loser'); }
+  } else {
+    ecY.className = 'end-card junk-card'; ecY.textContent = '—';
+    ecD.className = 'end-card ace-card'; ecD.textContent = 'A♠';
+    oY.innerHTML = 'Your blind guess was <strong>wrong</strong> — like 51 out of 52 times.';
+    oD.innerHTML = 'The dealer <strong>had to protect</strong> this card. It was the Ace all along.';
+    if (ch === 'switch') { eD.classList.add('winner'); eY.classList.add('loser'); }
+    else { eD.classList.add('loser'); eY.classList.add('loser'); }
+  }
+
+  // Narration
+  if (won) {
+    say(ch === 'switch'
+      ? '<strong>Ace found.</strong> The card the dealer was forced to protect had it. It almost always does.'
+      : '<strong>Ace found.</strong> Your 1-in-52 blind guess was right. That almost never happens — play a few more rounds and see.'
+    );
+  } else {
+    say(ch === 'switch'
+      ? '<strong>Missed.</strong> You were the rare 1-in-52 case where the blind guess was actually correct. Switching is still the right play — do it 52 times and you\'ll win 51.'
+      : '<strong>Missed.</strong> The Ace was the card the dealer was forced to protect. It\'s there 51 out of 52 times. Switch next round.'
+    );
+  }
+
+  document.getElementById('redealRow').classList.add('visible');
+}
+
+// ── Redeal ──
+function redeal() {
+  document.getElementById('top').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(() => { initDeck(); }, 350);
+}
+
+// ── Scores ──
+function updateScores() {
+  document.getElementById('sPlayed').textContent = stats.played;
+  document.getElementById('sSwitchW').textContent = stats.switchW;
+  document.getElementById('sKeepW').textContent = stats.keepW;
+  document.getElementById('sWrong').textContent = stats.wrong;
+}
+
+// ── Narrate ──
+function say(html) {
+  document.getElementById('narratText').innerHTML = html;
+}
+
+// ── Explain toggle ──
+function toggleExplain() {
+  const body = document.getElementById('explainBody');
+  const btn = document.getElementById('explainBtn');
+  const open = body.classList.toggle('open');
+  btn.classList.toggle('open');
+  btn.textContent = open ? 'Hide the math ▲' : 'Explain the math ▼';
+}
+
+// ── Start ──
+initDeck();
+</script>
+</body>
+</html>
